@@ -12,63 +12,68 @@ nav = webdriver.Chrome('/Users/robertvoss/Documents/GitHub/automacao-buscapreco/
 tabela_produtos = pd.read_excel("buscas.xlsx")
 display(tabela_produtos)
 
-#entrar no google
-nav.get("https://www.google.com/")
+def busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maximo): #funcao para pegar produto, termos banidos, precos e nome
+
+    #entrar no google
+    nav.get("https://www.google.com/")
+
+    produto = produto.lower()
+
+    termos_banidos = termos_banidos.lower()
+    lista_termos_banidos = termos_banidos.split(" ")
+    lista_termos_produto = produto.split(" ")
+
+    #pesquisar o nome do produto no google
+    nav.find_element(By.XPATH,'/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(produto)
+    nav.find_element(By.XPATH,'/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(Keys.ENTER)
+    #clicar no produto
+    elementos = nav.find_elements(By.CLASS_NAME,'hdtb-mitem')
+    for item in elementos:
+        if "Shopping" in item.text:
+            item.click()
+            break
+    #pegar o preço do produto
+    lista_resultados = nav.find_elements(By.CLASS_NAME, 'sh-dgr__grid-result')
+    lista_ofertas = [] # lista que a funcao vai dar como resposta
+    for resultado in lista_resultados:
+        nome = resultado.find_element(By.CLASS_NAME, 'Xjkr3b').text
+        nome = nome.lower()
+
+        #verificacao do nome
+        tem_termos_banidos = False
+        for palavra in lista_termos_banidos:
+            if palavra in nome:
+                tem_termos_banidos = True
+
+        tem_todos_termos_produto = True
+        for palavra in lista_termos_produto:
+            if palavra not in nome:
+                tem_todos_termos_produto = False
+
+        # se tem_termos_banidos = False e o tem_todos_termos_produto=True entao
+        if not tem_termos_banidos and tem_todos_termos_produto: #verifica nome
+            preco = resultado.find_element(By.CLASS_NAME, 'a8Pemb').text
+            preco = preco.replace("R$", "").replace(" ", "").replace(".", "").replace(",", ".")
+            preco = float(preco)
+
+        # verificando se preco ta minimo ou maximo
+            preco_maximo = float(preco_maximo)
+            preco_minimo = float(preco_minimo)
+            if preco_minimo <= preco <= preco_maximo:
+                elemento_link = resultado.find_element(By.CLASS_NAME, 'aULzUe')
+                elemento_pai = elemento_link.find_element(By.XPATH, '..')
+                link = elemento_pai.get_attribute('href')
+                print(preco, nome, link)
+                lista_ofertas.append((nome,preco,link))
+
+    return lista_ofertas
 
 produto = 'iphone 12 64 gb'
-produto = produto.lower()
-
 termos_banidos = 'mini watch'
-termos_banidos = termos_banidos.lower()
-lista_termos_banidos = termos_banidos.split(" ")
-lista_termos_produto = produto.split(" ")
-preco_minimo = '3000'
-preco_maximo = '3500'
-#pesquisar o nome do produto no google
-nav.find_element(By.XPATH,'/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(produto)
-nav.find_element(By.XPATH,'/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(Keys.ENTER)
-#clicar no produto
-elementos = nav.find_elements(By.CLASS_NAME,'hdtb-mitem')
-for item in elementos:
-    if "Shopping" in item.text:
-        item.click()
-        break
-#pegar o preço do produto
-lista_resultados = nav.find_elements(By.CLASS_NAME, 'sh-dgr__grid-result')
-
-for resultado in lista_resultados:
-    nome = resultado.find_element(By.CLASS_NAME, 'Xjkr3b').text
-    nome = nome.lower()
-
-    #verificacao do nome
-    tem_termos_banidos = False
-    for palavra in lista_termos_banidos:
-        if palavra in nome:
-            tem_termos_banidos = True
-
-    tem_todos_termos_produto = True
-    for palavra in lista_termos_produto:
-        if palavra not in nome:
-            tem_todos_termos_produto = False
-
-    # se tem_termos_banidos = False e o tem_todos_termos_produto=True entao
-    if not tem_termos_banidos and tem_todos_termos_produto: #verifica nome
-        preco = resultado.find_element(By.CLASS_NAME, 'a8Pemb').text
-        preco = preco.replace("R$", "").replace(" ", "").replace(".", "").replace(",", ".")
-        preco = float(preco)
-
-    # verificando se preco ta minimo ou maximo
-        preco_maximo = float(preco_maximo)
-        preco_minimo = float(preco_minimo)
-        if preco_minimo <= preco <= preco_maximo:
-            elemento_link = resultado.find_element(By.CLASS_NAME, 'aULzUe')
-            elemento_pai = elemento_link.find_element(By.XPATH, '..')
-            link = elemento_pai.get_attribute('href')
-            print(preco, nome, link)
-
-
-
-
+preco_minimo = '3500'
+preco_maximo = '4000'
+lista_ofertas_google_shopping = busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maximo)
+print(lista_ofertas_google_shopping)
 
 #para cada item na base de dados ->
     #procurar produto no google shopping
