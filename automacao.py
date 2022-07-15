@@ -16,12 +16,13 @@ def busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maxi
 
     #entrar no google
     nav.get("https://www.google.com/")
-
+    #tratando valores
     produto = produto.lower()
-
     termos_banidos = termos_banidos.lower()
     lista_termos_banidos = termos_banidos.split(" ")
     lista_termos_produto = produto.split(" ")
+    preco_maximo = float(preco_maximo)
+    preco_minimo = float(preco_minimo)
 
     #pesquisar o nome do produto no google
     nav.find_element(By.XPATH,'/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(produto)
@@ -57,8 +58,6 @@ def busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maxi
             preco = float(preco)
 
         # verificando se preco ta minimo ou maximo
-            preco_maximo = float(preco_maximo)
-            preco_minimo = float(preco_minimo)
             if preco_minimo <= preco <= preco_maximo:
                 elemento_link = resultado.find_element(By.CLASS_NAME, 'aULzUe')
                 elemento_pai = elemento_link.find_element(By.XPATH, '..')
@@ -68,12 +67,39 @@ def busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maxi
 
     return lista_ofertas
 
+def busca_buscape(nav, produto, termos_banidos, preco_minimo, preco_maximo):
+    #tratar valores da funçao
+    preco_maximo = float(preco_maximo)
+    preco_minimo = float(preco_minimo)
+    produto = produto.lower()
+    termos_banidos = termos_banidos.lower()
+    lista_termos_banidos = termos_banidos.split(" ")
+    lista_termos_produto = produto.split(" ")
+
+    #entrar no buscape
+    nav.get("https://www.buscape.com.br")
+    #pesquisar pelo produto no buscape
+    nav.find_element(By.CLASS_NAME, 'AutoCompleteStyle_textBox__eLv3V').send_keys(produto, Keys.ENTER)
+    #pegar a lista de resultados da busca do buscape
+
+    #para cada resultado
+
+    #ver se ele tem algum termo banido
+
+    #ver se ele tem todos os termos do nosso produto
+
+    #ver se o preço esta na faixa de preço ideal
+
+    #retornar lista de ofertas
+
 produto = 'iphone 12 64 gb'
 termos_banidos = 'mini watch'
 preco_minimo = '3500'
 preco_maximo = '4000'
-lista_ofertas_google_shopping = busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maximo)
-print(lista_ofertas_google_shopping)
+
+#busca_buscape(nav, produto, termos_banidos, preco_minimo, preco_maximo)
+# lista_ofertas_google_shopping = busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maximo)
+# print(lista_ofertas_google_shopping)
 
 #para cada item na base de dados ->
     #procurar produto no google shopping
