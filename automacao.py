@@ -118,7 +118,6 @@ def busca_buscape(nav, produto, termos_banidos, preco_minimo, preco_maximo) :
     # retornar lista de ofertas
 
 for linha in tabela_produtos.index:
-
 produto = 'iphone 12 64 gb'
 termos_banidos = 'mini watch'
 preco_minimo = '3000'
@@ -129,11 +128,7 @@ print(lista_ofertas_buscape)
 # lista_ofertas_google_shopping = busca_google_shopping(nav, produto, termos_banidos, preco_minimo, preco_maximo)
 # print(lista_ofertas_google_shopping)
 
-# para cada item na base de dados ->
-# procurar produto no google shopping
-# verificar se algum produto está na faixa de preço
-# procurar produto no buscape
-# verificar se algum produto está na faixa de preço
-# salvar as ofertas no dataframe(tabela)
 # exportar p excel
+
+
 # enviar para o e-mail o resultado da tabela
